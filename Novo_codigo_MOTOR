@@ -1,0 +1,151 @@
+// === Classe do Motor com controle de velocidade (PWM no L298N) ===
+class Motor
+{
+  private:
+    int pino_in1;
+    int pino_in2;
+    int pino_enable;
+    int velocidade = 255;
+
+  public:
+    Motor(int sentido_1, int sentido_2, int enable){
+      pino_in1 = sentido_1;
+      pino_in2 = sentido_2;
+      pino_enable = enable;
+
+      pinMode(pino_in1, OUTPUT);
+      pinMode(pino_in2, OUTPUT);
+      pinMode(pino_enable, OUTPUT);
+    }
+
+    void setVelocidade(int vel){
+      velocidade = constrain(vel, 0, 255);
+      analogWrite(pino_enable, velocidade);
+    }
+
+    void horario(){
+      digitalWrite(pino_in1, HIGH);
+      digitalWrite(pino_in2, LOW);
+      analogWrite(pino_enable, velocidade);
+    }
+
+    void antihorario(){
+      digitalWrite(pino_in1, LOW);
+      digitalWrite(pino_in2, HIGH);
+      analogWrite(pino_enable, velocidade);
+    }
+
+    void parar(){
+      digitalWrite(pino_in1, LOW);
+      digitalWrite(pino_in2, LOW);
+      analogWrite(pino_enable, 0);
+    }
+};
+
+// === Pinagem conforme seu mapeamento ===
+// Driver 1 - Motor 1
+#define IN1 37
+#define IN2 36
+#define ENA1 10
+
+// Driver 1 - Motor 2
+#define IN3 39
+#define IN4 38
+#define ENB1 11
+
+// Driver 2 - Motor 3
+#define IN5 41
+#define IN6 40
+#define ENA2 12
+
+// Driver 2 - Motor 4
+#define IN7 45
+#define IN8 44
+#define ENB2 13
+
+// === Instâncias dos motores ===
+Motor motor1(IN1, IN2, ENA1);
+Motor motor2(IN3, IN4, ENB1);
+Motor motor3(IN5, IN6, ENA2);
+Motor motor4(IN7, IN8, ENB2);
+
+// === Funções de movimento com tempo e velocidade ===
+void frente(unsigned long tempo, int velocidade){
+  motor1.setVelocidade(velocidade);
+  motor2.setVelocidade(velocidade);
+  motor3.setVelocidade(velocidade);
+  motor4.setVelocidade(velocidade);
+
+  motor1.horario();
+  motor2.horario();
+  motor3.horario();
+  motor4.horario();
+  delay(tempo);
+  pararTodos();
+}
+
+void tras(unsigned long tempo, int velocidade){
+  motor1.setVelocidade(velocidade);
+  motor2.setVelocidade(velocidade);
+  motor3.setVelocidade(velocidade);
+  motor4.setVelocidade(velocidade);
+
+  motor1.antihorario();
+  motor2.antihorario();
+  motor3.antihorario();
+  motor4.antihorario();
+  delay(tempo);
+  pararTodos();
+}
+
+void giro_proprio_eixo(unsigned long tempo, int velocidade){
+  motor1.setVelocidade(velocidade);
+  motor2.setVelocidade(velocidade);
+  motor3.setVelocidade(velocidade);
+  motor4.setVelocidade(velocidade);
+
+  motor1.horario();
+  motor2.antihorario();
+  motor3.horario();
+  motor4.antihorario();
+  delay(tempo);
+  pararTodos();
+}
+
+void lateral(unsigned long tempo, int velocidade){
+  motor1.setVelocidade(velocidade);
+  motor2.setVelocidade(velocidade);
+  motor3.setVelocidade(velocidade);
+  motor4.setVelocidade(velocidade);
+
+  motor1.horario();
+  motor2.antihorario();
+  motor3.antihorario();
+  motor4.horario();
+  delay(tempo);
+  pararTodos();
+}
+
+void diagonal(unsigned long tempo, int velocidade){
+  motor1.setVelocidade(velocidade);
+  motor4.setVelocidade(velocidade);
+
+  motor1.horario();
+  motor4.horario();
+  delay(tempo);
+  pararTodos();
+}
+
+void pararTodos(){
+  motor1.parar();
+  motor2.parar();
+  motor3.parar();
+  motor4.parar();
+}
+
+void setup() {
+}
+
+void loop() {
+  lateral(1000, 255);
+}
